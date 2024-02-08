@@ -1,3 +1,9 @@
+# Database file
+transactions.txt
+
+# Python file containing webhook URL
+webhook_url.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
