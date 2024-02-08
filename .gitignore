@@ -1,5 +1,5 @@
 # Database file
-transactions.txt
+transaction_ids.txt
 
 # Python file containing webhook URL
 webhook_url.py
