@@ -116,11 +116,11 @@ def process_feed(feed, future_players_of_interest, former_players_of_interest, t
         transaction_id = re.search(r'/t/(\d*)', item.guid).group(1)
         decoded_description = str(BeautifulSoup(item.description, features='html.parser'))
 
-        if re.search(r'From: <a href="https:\/\/www.eliteprospects.com\/team\/836\/', decoded_description):
+        if re.search(r'From: <a href="https:\/\/www.eliteprospects.com\/team\/548\/', decoded_description):
             # A player is leaving Michigan Tech
             process_match(transaction_id, transaction_ids_list, item.title, decoded_description, 'Departure')
 
-        elif re.search(r'To: <a href="https:\/\/www.eliteprospects.com\/team\/836\/', decoded_description):
+        elif re.search(r'To: <a href="https:\/\/www.eliteprospects.com\/team\/548\/', decoded_description):
             # A player is joining Michigan Tech
             process_match(transaction_id, transaction_ids_list, item.title, decoded_description, 'Arrival')
 
