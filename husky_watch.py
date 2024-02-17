@@ -45,7 +45,7 @@ def process_match(transaction_id, transaction_ids_list, title, decoded_descripti
     message = construct_message(title, decoded_description, type)
 
     # Record the transaction's ID so we know not to publish it again it we still see it later on
-    with open('transaction_ids.txt', 'a') as transaction_ids_file:
+    with open('/volume3/WilliamCloud/HuskyWatch/transaction_ids.txt', 'a') as transaction_ids_file:
         date_and_time = datetime.datetime.now()
         transaction_ids_file.write(transaction_id + ',' + str(date_and_time) + '\n')
 
@@ -62,7 +62,7 @@ def setup():
     script_invocation_time = datetime.datetime.now()
 
     # Loop through each transaction listed in transaction_ids.txt to determine if we still need to keep track of it
-    with open('transaction_ids.txt', 'r') as transaction_ids_file:
+    with open('/volume3/WilliamCloud/HuskyWatch/transaction_ids.txt', 'r') as transaction_ids_file:
         transaction_ids_file_lines = transaction_ids_file.readlines()
         
         for line in transaction_ids_file_lines:
@@ -81,7 +81,7 @@ def setup():
             transaction_lines_to_add_back.append(line)
             
     # Clear the transaction_ids.txt file and only write back the lines whose transactions we still want to keep track of
-    with open('transaction_ids.txt', 'w') as transaction_ids_file:
+    with open('/volume3/WilliamCloud/HuskyWatch/transaction_ids.txt', 'w') as transaction_ids_file:
         for line in transaction_lines_to_add_back:
             transaction_ids_file.write(line)
 
