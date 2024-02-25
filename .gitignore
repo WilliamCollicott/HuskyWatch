@@ -1,8 +1,8 @@
 # Database file
 transaction_ids.txt
 
-# Python file containing webhook URL
-webhook_url.py
+# Python file containing the webhook URL and local path to the transaction_ids.txt file
+links_and_paths.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
