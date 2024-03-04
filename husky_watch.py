@@ -28,7 +28,7 @@ def construct_message(title, decoded_description, type):
     # Assemble the formatted string
     message = '__***MTU Hockey %s Alert***__\n%s\n%s\n%s' % (type, title, status, date)
 
-    # If the transer's description has 'additional information' (not all will have this), add it onto the message
+    # If the transfer's description has 'additional information' (not all will have this), add it onto the message
     if re.search(r'Information:', decoded_description):
         information = re.search(r'(Information: .*)<br/>', decoded_description).group(1)
         message += ('\n' + information)
