@@ -124,10 +124,10 @@ def process_feed(feed, poi_player_page_urls, transaction_ids_list):
         decoded_description = str(BeautifulSoup(item.description, features='html.parser'))
         match_type = ''
 
-        if re.search(r'From: <a href="https:\/\/www.eliteprospects.com\/team\/548\/', decoded_description):
+        if re.search(r'From: <a href="https:\/\/www\.eliteprospects\.com\/team\/548\/', decoded_description):
             # A player is leaving Michigan Tech
             match_type = 'Departure'
-        elif re.search(r'To: <a href="https:\/\/www.eliteprospects.com\/team\/548\/', decoded_description):
+        elif re.search(r'To: <a href="https:\/\/www\.eliteprospects\.com\/team\/548\/', decoded_description):
             # A player is joining Michigan Tech
             match_type = 'Arrival'
         else:
