@@ -39,9 +39,9 @@ def construct_message(title, decoded_description, type):
     ep_player_page_data = requests.get(ep_player_page)
     ep_player_page_html = BeautifulSoup(ep_player_page_data.text, 'html.parser')
     ep_player_page_picture_section = ep_player_page_html.find('div', {'class': 'ep-entity-header__main-image'})
-    ep_player_page_picture_search = re.search(r'url\(\'(.*)\'\);', ep_player_page_picture_section['style'])
+    ep_player_page_picture_search = re.search(r'url\([\"\'](.*)[\"\']\);', ep_player_page_picture_section['style'])
 
-    if ep_player_page_picture_search:
+    if ep_player_page_picture_search and (ep_player_page_picture_search.group(1) != 'https://static.eliteprospects.com/images/player-fallback.jpg'):
         # The player's page has a profile photo
         print(ep_player_page_picture_search.group(1))
         return message, ep_player_page_picture_search.group(1)
@@ -50,18 +50,13 @@ def construct_message(title, decoded_description, type):
         return message, None
 
 # For a given transaction, delegate the message construction to construct_message() and publish it
-def process_match(transaction_id, transaction_ids_list, title, decoded_description, type):
+def send_discord_message(transaction_id, transaction_ids_list, title, decoded_description, type):
     if transaction_id in transaction_ids_list:
         # Don't send out an alert for this transfer if we've already sent it out
         return
 
     # Assamble the message to be published
     message, player_picture_path = construct_message(title, decoded_description, type)
-
-    # Record the transaction's ID so we know not to publish it again it we still see it later on
-    with open(transaction_ids_path + 'transaction_ids.txt', 'a') as transaction_ids_file:
-        date_and_time = datetime.datetime.now()
-        transaction_ids_file.write(transaction_id + ',' + str(date_and_time) + '\n')
 
     # Attach the player's image if it exists
     if player_picture_path is not None:
@@ -71,6 +66,11 @@ def process_match(transaction_id, transaction_ids_list, title, decoded_descripti
 
     # Publish the message and optional image to Discord
     webhook.execute()
+
+    # Record the transaction's ID so we know not to publish it again it we still see it later on
+    with open(transaction_ids_path + 'transaction_ids.txt', 'a') as transaction_ids_file:
+        date_and_time = datetime.datetime.now()
+        transaction_ids_file.write(transaction_id + ',' + str(date_and_time) + '\n')
 
 # Assemble the lists of players to look out for and the list of transactions that have already been published
 def setup():
@@ -148,7 +148,7 @@ def process_feed(feed, poi_player_page_urls, transaction_ids_list):
                         match_type = 'Former Player'
 
         if match_type != '':
-            process_match(transaction_id, transaction_ids_list, item.title, decoded_description, match_type)
+            send_discord_message(transaction_id, transaction_ids_list, item.title, decoded_description, match_type)
 
 def main():
     poi_player_page_urls, transaction_ids_list = setup()
