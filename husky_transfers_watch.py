@@ -1,6 +1,6 @@
 import re
 import os.path
-from links_and_paths import webhook_url, published_transfers_path, rink_live_spreadsheet_id, rink_live_tab_name, gopher_puck_live_shreadsheet_id, gopher_puck_live_tab_name
+from links_and_paths import webhook_url, published_transfers_path, rink_live_spreadsheet_id, rink_live_tab_name, gopher_puck_live_shreadsheet_id, gopher_puck_live_tab_name, token_json_path, credentials_json_path
 from discord_webhook import DiscordWebhook
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -18,8 +18,8 @@ def get_portal_spreadsheet_data(spreadsheet_id, sheet_name):
 
     # token.json stores the user's access and refresh tokens.
     # It's created automatically when the authorization flow completes for the first time.
-    if os.path.exists('token.json'):
-        creds = Credentials.from_authorized_user_file('token.json', scopes)
+    if os.path.exists(token_json_path + 'token.json'):
+        creds = Credentials.from_authorized_user_file(token_json_path + 'token.json', scopes)
     
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
@@ -27,12 +27,12 @@ def get_portal_spreadsheet_data(spreadsheet_id, sheet_name):
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', scopes
+                credentials_json_path + 'credentials.json', scopes
             )
             creds = flow.run_local_server(port=0)
 
         # Save the credentials for the next run
-        with open('token.json', 'w') as token:
+        with open(token_json_path + 'token.json', 'w') as token:
             token.write(creds.to_json())
     try:
         service = build('sheets', 'v4', credentials=creds)
