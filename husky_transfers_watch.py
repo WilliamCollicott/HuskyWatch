@@ -65,10 +65,19 @@ def process_portal_spreadsheet(portal_spreadsheet_data, starting_row, origin_tea
         except IndexError:
             destination_team = ''
 
+        # If Michigan Tech is a player's origin or destination team, record information about the transfer: player name, position, origin team, destination team.
         if row[origin_team_column] in mtu_strings or destination_team in mtu_strings:
-            # If Michigan Tech is a player's origin or destination team, record information about the transfer: player name, position, origin team, destination team.
-            transfer_parts = [row[date_added_column], row[player_name_column], row[position_column][0].upper(), row[origin_team_column], '?' if destination_team == '' else destination_team]
-            
+            # Parse out and re-assemble the date added in order to account for differences in different sheets' date format, typos, etc.
+            date_parts = re.search(r'(\d+)\/(\d+)\/(\d+)', row[date_added_column])
+            month = date_parts.group(1)
+            day = date_parts.group(2)
+            year = date_parts.group(3)
+
+            if not year.startswith('20'):
+                year = '20' + year
+
+            date_added = month + '/' + day + '/' + year
+            transfer_parts = [date_added, row[player_name_column], row[position_column][0].upper(), row[origin_team_column], '?' if destination_team == '' else destination_team]
             already_present = False
             
             # Look for the player's name in our list transfers we've already compiled from other transfer portal spreadsheets.
