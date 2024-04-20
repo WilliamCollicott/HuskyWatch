@@ -79,7 +79,8 @@ def get_player_page_links():
 # Assemble list of transaction IDs representing transactions published less than 14 days ago.
 # Remove lines from transaction_ids.txt representing transactions that are at least 14 days old.
 def update_transaction_ids_file():
-    transaction_ids_list = []           # list of transaction IDs that we've published less than 14 days ago.
+    # List of transaction IDs that we've published less than 14 days ago.
+    transaction_ids_list = []
     script_invocation_time = datetime.datetime.now()
 
     # Loop through each transaction listed in transaction_ids.txt to determine if we still need to keep track of it.
