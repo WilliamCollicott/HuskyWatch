@@ -59,16 +59,28 @@ def get_portal_spreadsheet_data(spreadsheet_id, sheet_name):
 def process_portal_spreadsheet(portal_spreadsheet_data, starting_row, origin_team_column, position_column, player_name_column, destination_team_column, date_added_column):
     # Loop through each row in the spreadsheet data.
     for row in portal_spreadsheet_data[starting_row:]:
-        # Handle the situation where sometimes a player's destination team isn't listed and instead represented as not part of the row instead of an empty string.
+        # Handle situations where sometimes a row's columns are empty and represented as not part of the row instead of just an empty string.
         try:
-            destination_team = row[destination_team_column]
+            origin_team = row[origin_team_column].strip()
         except IndexError:
-            destination_team = ''
+            # If there's no origin team listed, move on to the next row.
+            continue
+
+        try:
+            destination_team = '?' if row[destination_team_column] == '' else row[destination_team_column].strip()     
+        except IndexError:
+            destination_team = '?'
+
+        try:
+            # A player's position will be represented as either F, D, or G.
+            position = '?' if row[position_column][0].upper() == '' else row[position_column].strip()[0].upper()
+        except IndexError:
+            position = '?'
 
         # If Michigan Tech is a player's origin or destination team, record information about the transfer: player name, position, origin team, destination team.
-        if row[origin_team_column] in mtu_strings or destination_team in mtu_strings:
+        if origin_team in mtu_strings or destination_team in mtu_strings:
             # Parse out and re-assemble the date added in order to account for differences in different sheets' date format, typos, etc.
-            date_parts = re.search(r'(\d+)\/(\d+)\/(\d+)', row[date_added_column])
+            date_parts = re.search(r'(\d+)\/(\d+)\/(\d+)', row[date_added_column].strip())
             month = date_parts.group(1)
             day = date_parts.group(2)
             year = date_parts.group(3)
@@ -77,22 +89,27 @@ def process_portal_spreadsheet(portal_spreadsheet_data, starting_row, origin_tea
                 year = '20' + year
 
             date_added = month + '/' + day + '/' + year
-            transfer_parts = [date_added, row[player_name_column], row[position_column][0].upper(), row[origin_team_column], '?' if destination_team == '' else destination_team]
+            current_transfer = [date_added, row[player_name_column].strip(), position, origin_team, destination_team]
             already_present = False
             
             # Look for the player's name in our list transfers we've already compiled from other transfer portal spreadsheets.
-            for transfer in inter_university_transfers:
-                if transfer_parts[1] == transfer[1]:
+            for existing_transfer in inter_university_transfers:
+                if current_transfer[1] == existing_transfer[1]:
                     # If we already saw this transfer in another transfer portal spreadsheet, check to see if it had a destination team listed.
                     already_present = True
-                    if transfer_parts[4] != '?' and transfer[4] == '?':
+
+                    if current_transfer[2] != '?' and existing_transfer[2] == '?':
+                        # If the previous mention of this transfer didn't list the player's position, but this spreadsheet does, add it.
+                        existing_transfer[2] == current_transfer[2]
+
+                    if current_transfer[4] != '?' and existing_transfer[4] == '?':
                         # If the previous mention of this transfer didn't list a destination team, but this spreadsheet does, add it.
-                        transfer[4] = transfer_parts[4]
+                        existing_transfer[4] = current_transfer[4]
                         break
 
             # If this tranfer was not previously recorded, add it to our list of transfers to publish (as long as we didn't publish it in a previous invocation).
             if not already_present:
-                inter_university_transfers.append(transfer_parts)
+                inter_university_transfers.append(current_transfer)
 
 # Examine each transfer involving Michigan Tech that was gathered from the transfer portal spreadsheets.
 # Send out a notification for any that haven't been published yet or completed (published without a destination team).
