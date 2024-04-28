@@ -34,13 +34,16 @@ def construct_message(title, decoded_description, type):
     # Attach the player page's profile photo to the message if it exists.
     ep_player_page_data = requests.get(ep_player_page)
     ep_player_page_html = BeautifulSoup(ep_player_page_data.text, 'html.parser')
-    ep_player_page_picture_section = ep_player_page_html.find('div', {'class': 'ep-entity-header__main-image'})
-    ep_player_page_picture_search = re.search(r'url\([\"\'](.*)[\"\']\);', ep_player_page_picture_section['style'])
+    ep_player_page_picture_section = ep_player_page_html.find('img', {'class': 'ProfileImage_profileImage__JLd31 ProfileImage_playerImage__1fLtE'})
+    ep_player_picture_link = ep_player_page_picture_section['src']
 
-    if ep_player_page_picture_search and (ep_player_page_picture_search.group(1) != 'https://static.eliteprospects.com/images/player-fallback.jpg'):
+    if 'https:' not in ep_player_picture_link:
+            ep_player_picture_link = 'https:' + ep_player_picture_link
+
+    if ep_player_picture_link != 'https://cdn.eliteprospects.com/icons/placeholders/player-logo.svg':
         # The player's page has a profile photo.
-        print(ep_player_page_picture_search.group(1))
-        return message, ep_player_page_picture_search.group(1)
+        print(ep_player_picture_link)
+        return message, ep_player_picture_link
     else:
         # The player's page does not have a profile photo.
         return message, None
@@ -52,7 +55,7 @@ def send_transaction_to_discord(transaction_id, title, decoded_description, type
 
     # Attach the player's image if it exists.
     if player_picture_path is not None:
-        webhook = DiscordWebhook(url=webhook_url, content=message, embeds=[{ 'image': { 'url': 'https:' + player_picture_path } }])
+        webhook = DiscordWebhook(url=webhook_url, content=message, embeds=[{ 'image': { 'url': player_picture_path } }])
     else:
         webhook = DiscordWebhook(url=webhook_url, content=message)
 

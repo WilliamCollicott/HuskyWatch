@@ -64,7 +64,7 @@ def process_portal_spreadsheet(portal_spreadsheet_data, starting_row, origin_tea
             origin_team = row[origin_team_column].strip()
 
             if origin_team == '':
-                continue
+                raise IndexError('The origin team is not listed!')
         except IndexError:
             # If there's no origin team listed, move on to the next row.
             continue
