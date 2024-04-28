@@ -62,6 +62,9 @@ def process_portal_spreadsheet(portal_spreadsheet_data, starting_row, origin_tea
         # Handle situations where sometimes a row's columns are empty and represented as not part of the row instead of just an empty string.
         try:
             origin_team = row[origin_team_column].strip()
+
+            if origin_team == '':
+                continue
         except IndexError:
             # If there's no origin team listed, move on to the next row.
             continue
