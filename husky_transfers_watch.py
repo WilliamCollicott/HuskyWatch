@@ -70,20 +70,29 @@ def process_portal_spreadsheet(portal_spreadsheet_data, starting_row, origin_tea
             continue
 
         try:
+            date_column_string = row[date_added_column].strip()
+
+            if date_column_string == '':
+                raise IndexError('The date added is not listed!')
+        except IndexError:
+            # If there's no date listed for when the player entered the portal, move on to the next row.
+            continue
+
+        try:
             destination_team = '?' if row[destination_team_column] == '' else row[destination_team_column].strip()     
         except IndexError:
             destination_team = '?'
 
         try:
             # A player's position will be represented as either F, D, or G.
-            position = '?' if row[position_column][0].upper() == '' else row[position_column].strip()[0].upper()
+            position = 'player' if row[position_column][0].upper() == '' else row[position_column].strip()[0].upper()
         except IndexError:
-            position = '?'
+            position = 'player'
 
         # If Michigan Tech is a player's origin or destination team, record information about the transfer: player name, position, origin team, destination team.
         if origin_team in mtu_strings or destination_team in mtu_strings:
             # Parse out and re-assemble the date added in order to account for differences in different sheets' date format, typos, etc.
-            date_parts = re.search(r'(\d+)\/(\d+)\/(\d+)', row[date_added_column].strip())
+            date_parts = re.search(r'(\d+)\/(\d+)\/(\d+)', date_column_string)
             month = date_parts.group(1)
             day = date_parts.group(2)
             year = date_parts.group(3)
@@ -92,6 +101,14 @@ def process_portal_spreadsheet(portal_spreadsheet_data, starting_row, origin_tea
                 year = '20' + year
 
             date_added = month + '/' + day + '/' + year
+
+            # If either the origin or destination team is Michigan Tech, use a common name to avoid saying 'Michigan Technological University' or 'MTU'.
+            if origin_team in mtu_strings:
+                origin_team = 'Michigan Tech'
+
+            if destination_team in mtu_strings:
+                destination_team = 'Michigan Tech'
+
             current_transfer = [date_added, row[player_name_column].strip(), position, origin_team, destination_team]
             already_present = False
             
@@ -101,7 +118,7 @@ def process_portal_spreadsheet(portal_spreadsheet_data, starting_row, origin_tea
                     # If we already saw this transfer in another transfer portal spreadsheet, check to see if it had a destination team listed.
                     already_present = True
 
-                    if current_transfer[2] != '?' and existing_transfer[2] == '?':
+                    if current_transfer[2] != 'player' and existing_transfer[2] == 'player':
                         # If the previous mention of this transfer didn't list the player's position, but this spreadsheet does, add it.
                         existing_transfer[2] == current_transfer[2]
 
