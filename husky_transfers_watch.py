@@ -62,20 +62,12 @@ def process_portal_spreadsheet(portal_spreadsheet_data, starting_row, origin_tea
         # Handle situations where sometimes a row's columns are empty and represented as not part of the row instead of just an empty string.
         try:
             origin_team = row[origin_team_column].strip()
-
-            if origin_team == '':
-                raise IndexError('The origin team is not listed!')
-        except IndexError:
-            # If there's no origin team listed, move on to the next row.
-            continue
-
-        try:
             date_column_string = row[date_added_column].strip()
 
-            if date_column_string == '':
-                raise IndexError('The date added is not listed!')
+            if '' in [origin_team, date_column_string]:
+                raise IndexError()
         except IndexError:
-            # If there's no date listed for when the player entered the portal, move on to the next row.
+            # If there's no origin team or date for when the player entered the portal listed, move on to the next row.
             continue
 
         try:
