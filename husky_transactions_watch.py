@@ -137,6 +137,9 @@ def process_feed(player_page_urls, transaction_ids_list):
                     # Instead, later on, look for these kinds of transactions in a transfer portal spreadsheet.
                     continue
 
+            print(item.title)
+            print(decoded_description)
+
             # A player is leaving Michigan Tech.
             match_type = 'Departure'
 
@@ -147,12 +150,18 @@ def process_feed(player_page_urls, transaction_ids_list):
                 if origin_team_id in ncaa_d1_team_ids:
                     continue
 
+            print(item.title)
+            print(decoded_description)
+
             # A player is joining Michigan Tech.
             match_type = 'Arrival'
         else:
             # If Michigan Tech is not mentioned in the transaction, check to see if a future or former player is involved.
             for url in player_page_urls:
                 if re.search(url, decoded_description):
+                    print(item.title)
+                    print(decoded_description)
+
                     # A future or former Michigan Tech player is involved in this transaction.
                     player_page_data = requests.get(url + '?league=NCAA')
                     player_page_html = BeautifulSoup(player_page_data.text, 'html.parser')
