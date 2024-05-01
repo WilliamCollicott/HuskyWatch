@@ -159,16 +159,24 @@ def process_feed(player_page_urls, transaction_ids_list):
             # If Michigan Tech is not mentioned in the transaction, check to see if a future or former player is involved.
             for url in player_page_urls:
                 if re.search(url, decoded_description):
+                    # A future or former Michigan Tech player is involved in this transaction.
                     print(item.title)
                     print(decoded_description)
 
-                    # A future or former Michigan Tech player is involved in this transaction.
-                    player_page_data = requests.get(url + '?league=NCAA')
-                    player_page_html = BeautifulSoup(player_page_data.text, 'html.parser')
-                    stats_section = player_page_html.find('div', {'id': 'league-stats'})
-                    ncaa_section = stats_section.find_all('tr', {'data-league': 'NCAA'})
+                    # Extract the player's ID from their profile URL.
+                    player_id_search = re.search(r'https://www\.eliteprospects\.com/player/(\d*)/', url)
+                    player_id = player_id_search.group(1)
 
-                    if len(ncaa_section) == 1 and ncaa_section[0].find('td', {'class': 'regular gp'}).text == '-*':
+                    # If the last row of the player's stats table says 'Michigan Tech' and there are no numbers (hyphens in all stat columns),
+                    # then we know they're a future player. Otherwise, they're a former player.
+                    player_page_data = requests.get('https://www.eliteprospects.com/iframe_player_stats.php?player=' + player_id)
+                    player_page_html = BeautifulSoup(player_page_data.text, 'html.parser')
+                    page_body = player_page_html.find('body')
+                    table_rows = page_body.find_all('tr')
+                    last_row = table_rows[-1]
+                    dashed_columns = re.findall(r'>-<', str(last_row))
+
+                    if 'Michigan Tech' in str(last_row) and len(dashed_columns) == 5:
                         # The player is a future Michigan Tech player.
                         match_type = 'Future Player'
                     else:
