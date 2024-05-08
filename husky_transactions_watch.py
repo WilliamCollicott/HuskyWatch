@@ -126,6 +126,13 @@ def process_feed(player_page_urls, transaction_ids_list):
             continue
 
         decoded_description = str(BeautifulSoup(item.description, features='html.parser'))
+
+        if 'College transfer' in decoded_description:
+            # If the transaction is labeled as an inter-university transfer, do not process it. Not all of them have this label, so that's why
+            # there's checks later on to catch them when they're between two NCAA D1 teams. This IF statements helps catch a player's transfer
+            # from a D1 team to a D3 team, or vice versa.
+            continue
+
         match_type = ''
 
         if re.search(r'From: <a href="https:\/\/www\.eliteprospects\.com\/team\/548\/', decoded_description):
