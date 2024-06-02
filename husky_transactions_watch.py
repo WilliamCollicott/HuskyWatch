@@ -141,7 +141,7 @@ def process_feed(player_page_urls, transaction_ids_list):
                 destination_team_id = match.group(1)
                 if destination_team_id in ncaa_d1_team_ids:
                     # Do not process inter-university transfers in the EliteProspects transaction feed.
-                    # Instead, later on, look for these kinds of transactions in a transfer portal spreadsheet.
+                    # Instead, later on, look for these kinds of transactions in the transfer portal spreadsheets.
                     continue
 
             print(item.title)
