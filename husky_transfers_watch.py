@@ -34,6 +34,7 @@ def get_portal_spreadsheet_data(spreadsheet_id, sheet_name):
         # Save the credentials for the next run
         with open(token_json_path + 'token.json', 'w') as token:
             token.write(creds.to_json())
+            token.flush()
     try:
         service = build('sheets', 'v4', credentials=creds)
 
@@ -157,6 +158,7 @@ def send_transfers_to_discord():
                     else:
                         published_transfers_file.write(published_transfer)
 
+                    published_transfers_file.flush()
                     break
 
             if not transfer_already_published:
@@ -171,6 +173,7 @@ def send_transfers_to_discord():
                 webhook = DiscordWebhook(url=webhook_url, content=message)
                 webhook.execute()
                 published_transfers_file.write('%s,%s,%s\n' % (player_name, origin_team, destination_team))
+                published_transfers_file.flush()
 
 def main():
     rink_live_portal_data = get_portal_spreadsheet_data(rink_live_spreadsheet_id, rink_live_tab_name)

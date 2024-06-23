@@ -66,6 +66,7 @@ def send_transaction_to_discord(transaction_id, title, decoded_description, type
     with open(transaction_ids_path + 'transaction_ids.txt', 'a') as transaction_ids_file:
         date_and_time = datetime.datetime.now()
         transaction_ids_file.write(transaction_id + ',' + str(date_and_time) + '\n')
+        transaction_ids_file.flush()
 
 # Assemble a list of EliteProspects player page URLs representing future and former Michigan Tech players.
 # This information will come from Michigan Tech's 'Where are they now' page.
@@ -106,6 +107,7 @@ def update_transaction_ids_file():
             # If we published the transaction less than 14 days ago, continue to keep track of it.
             transaction_ids_list.append(transaction_id)
             transaction_ids_file.write(line)
+            transaction_ids_file.flush()
 
     return transaction_ids_list
 
