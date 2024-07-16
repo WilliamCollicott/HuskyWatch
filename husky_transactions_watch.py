@@ -16,13 +16,12 @@ ncaa_d1_team_ids = ['2453', '1252', '18066', '1273', '35387', '790',  '2319', '9
 # This method parses a transaction's description section and assembles the string representing the message to be published.
 def construct_message(title, decoded_description, type):
     # Parse out the sections of the description we're interested in.
-    details = re.search(r'(Status: .*)<br/>\n(Date: .*)<br/>\nPlayer: <a href=\"(.*)\">', decoded_description)
+    details = re.search(r'(Status: .*)<br/>\nDate: .*<br/>\nPlayer: <a href=\"(.*)\">', decoded_description)
     status = details.group(1)
-    date = details.group(2)
-    ep_player_page = details.group(3)
+    ep_player_page = details.group(2)
 
     # Assemble the formatted string.
-    message = '__***MTU Hockey %s Alert***__\n%s\n%s\n%s' % (type, title, status, date)
+    message = '__***MTU Hockey %s Alert***__\n%s\n%s' % (type, title, status)
 
     # If the transaction's description has 'additional information' (not all will have this), add it onto the message.
     if re.search(r'Information:', decoded_description):
